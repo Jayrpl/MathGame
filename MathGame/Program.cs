@@ -4,12 +4,11 @@
 // 3. Users should be presented with a menu to choose an operation
 // 4. record previous games in a List and there should be an option in the menu for the user to visualize a history of previous games.
 
-Console.WriteLine("Hello, World!");
+using CodingProject;
 
-class MathLogic
-{
-  public int Add()
-  {
-    return 0;
-  }
-}
+MathGameLogic mathGame = new MathGameLogic();
+Random random = new Random();
+
+int firstNumber;
+int secondNumber;
+

@@ -25,34 +25,41 @@ namespace CodingProject
         {
             switch (operation)
             {
-                case '1':
+                case '+':
                     {
                         previousGames.Add($"{firstNumber} + {secondNumber} = {firstNumber + secondNumber}");
                         return firstNumber + secondNumber;
-                        break;
                     }
-                case '2':
+                case '-':
                     {
                         previousGames.Add($"{firstNumber} - {secondNumber} = {firstNumber - secondNumber}");
                         return firstNumber - secondNumber;
-                        break;
                     }
-                case '3':
+                case '*':
                     {
                         previousGames.Add($"{firstNumber} x {secondNumber} = {firstNumber * secondNumber}");
                         return firstNumber * secondNumber;
                     }
-                case '4':
-                    while (firstNumber < 0 || firstNumber > 100)
+                case '/':
                     {
-                        try
+                        while (firstNumber < 0 || firstNumber > 100)
                         {
-                            Console.WriteLine("Please enter a number between 1 and 100");
-                            firstNumber = Convert.ToInt32(Console.ReadLiine());
+                            try
+                            {
+                                Console.WriteLine("Please enter a number between 1 and 100");
+                                firstNumber = Convert.ToInt32(Console.ReadLine());
+                            }
+                            catch (System.Exception)
+                            {
+                                // Do nothing
+                            }
                         }
-                }
+                        previousGames.Add($"{firstNumber} / {secondNumber} = {firstNumber / secondNumber}");
+                        return firstNumber / secondNumber;
+                    }
             }
+
+            return 0;
         }
     }
-}
 }
