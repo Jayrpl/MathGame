@@ -5,6 +5,7 @@
 // 4. record previous games in a List and there should be an option in the menu for the user to visualize a history of previous games.
 
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using CodingProject;
 
 MathGameLogic mathGame = new MathGameLogic();
@@ -15,6 +16,100 @@ int secondNumber;
 int userMenuSelection;
 int score = 0;
 bool gameOver = false;
+
+DifficultyLevel difficultyLevel = DifficultyLevel.Easy;
+
+while (!gameOver)
+{
+  userMenuSelection = GetMenuSelection(mathGame);
+
+  firstNumber = random.Next(1, 101);
+  secondNumber = random.Next(1, 101);
+
+  switch (userMenuSelection)
+  {
+    case 1:
+      score += await PerformOperation(mathGame, firstNumber, secondNumber, score, '+', difficultyLevel);
+      break;
+    case 2:
+      score += await PerformOperation(mathGame, firstNumber, secondNumber, score, '-', difficultyLevel);
+      break;
+    case 3:
+      score += await PerformOperation(mathGame, firstNumber, secondNumber, score, '*', difficultyLevel);
+      break;
+    case 4:
+      while (firstNumber % secondNumber != 0)
+      {
+        firstNumber = random.Next(1, 101);
+        secondNumber = random.Next(1, 101);
+      }
+      score += await PerformOperation(mathGame, firstNumber, secondNumber, score, '/', difficultyLevel);
+      break;
+    case 5:
+      int numberofQuestions = 99;
+      Console.WriteLine("Please enter the number of questions you want to attempt.");
+      while (!int.TryParse(Console.ReadLine(), out numberofQuestions))
+      {
+        Console.WriteLine("Please enter the number of questions you want to attempt as a whole number.");
+      }
+      while (numberofQuestions > 0)
+      {
+        int randomOperation = random.Next(1, 5);
+
+        if (randomOperation == 1)
+        {
+          firstNumber = random.Next(1, 101);
+          secondNumber = random.Next(1, 101);
+          score += await PerformOperation(mathGame, firstNumber, secondNumber, score, '+', difficultyLevel);
+        }
+        else if (randomOperation == 2)
+        {
+          firstNumber = random.Next(1, 101);
+          secondNumber = random.Next(1, 101);
+          score += await PerformOperation(mathGame, firstNumber, secondNumber, score, '-', difficultyLevel);
+        }
+        else if (randomOperation == 3)
+        {
+          firstNumber = random.Next(1, 101);
+          secondNumber = random.Next(1, 101);
+          score += await PerformOperation(mathGame, firstNumber, secondNumber, score, '*', difficultyLevel);
+        }
+        else
+        {
+          firstNumber = random.Next(1, 101);
+          secondNumber = random.Next(1, 101);
+          score += await PerformOperation(mathGame, firstNumber, secondNumber, score, '/', difficultyLevel);
+        }
+
+        while (firstNumber % secondNumber != 0)
+        {
+          firstNumber = random.Next(1, 101);
+          secondNumber = random.Next(1, 101);
+        }
+        score += await PerformOperation(mathGame, firstNumber, secondNumber, score, '/', difficultyLevel);
+      }
+      numberofQuestions--;
+      break;
+    case 6:
+      Console.WriteLine("Game History: \n");
+      foreach (var game in mathGame.previousGames)
+      {
+        Console.WriteLine($"{game}");
+      }
+      break;
+    case 7:
+      difficultyLevel = ChangeDifficulty();
+      DifficultyLevel difficultyEnum = (DifficultyLevel)difficultyLevel;
+      Enum.IsDefined(typeof(DifficultyLevel), difficultyEnum);
+      Console.WriteLine($"Your new difficulty is: {difficultyEnum}");
+      break;
+    case 8:
+      gameOver = true;
+      Console.WriteLine($"Your final score is: {score}");
+      break;
+
+  }
+}
 
 static DifficultyLevel ChangeDifficulty()
 {
@@ -85,20 +180,47 @@ static async Task<int?> GetUserResponse(DifficultyLevel difficulty)
 
     stopwatch.Stop();
 
-    if (result != null &&int.TryParse(result, out response))
+    if (result != null && int.TryParse(result, out response))
     {
-      Console.WriteLine($"Time taken to answer: {stopwatch.Elapsed.ToString(@"m\::ss\.fff")}");
+      Console.WriteLine($"Time taken to answer: {stopwatch.Elapsed}");
+      return response;
     }
-// something here
+    // something here
     else throw new OperationCanceledException();
   }
-  catch (OperationCanceledException)
-}
+  catch (OperationCanceledException ex)
+  {
+    Console.WriteLine("Time is up!");
+    return null;
+  }
 
-static void PerformOperation(char operation)
-{
 
-}
+  static int ValidateResult(int result, int? userResponse, int score)
+  {
+    if (result == userResponse)
+    {
+      Console.WriteLine("Well done! You earned 5 points");
+      score += 5;
+    }
+    else
+    {
+      Console.WriteLine("Try again!");
+      Console.WriteLine($"Correct answer is: {result}");
+    }
+
+    return score;
+  }
+
+  static async Task<int> PerformOperation(MathGameLogic mathGame, int firstNumber, int secondNumber, int score, char operation, DifficultyLevel difficulty)
+  {
+    int result;
+    int? userResponse;
+    DisplayMathGameQuestion(firstNumber, secondNumber, operation);
+    result = mathGame.MathOperation(firstNumber, secondNumber, operation);
+    userResponse = await GetUserResponse(difficulty);
+    score += ValidateResult(result, userResponse, score);
+    return score;
+  }
 
 public enum DifficultyLevel
 {
