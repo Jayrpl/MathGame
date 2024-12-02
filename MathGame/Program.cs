@@ -81,8 +81,18 @@ static async Task<int?> GetUserResponse(DifficultyLevel difficulty)
 
   try
   {
-    string? result = await Task.WhenAny(getuserInputTask, Task.Delay(timeout * 1000)) == getuserInputTask;
+    string? result = await Task.WhenAny(getuserInputTask, Task.Delay(timeout * 1000)) == getuserInputTask ? getuserInputTask.Result : null;
+
+    stopwatch.Stop();
+
+    if (result != null &&int.TryParse(result, out response))
+    {
+      Console.WriteLine($"Time taken to answer: {stopwatch.Elapsed.ToString(@"m\::ss\.fff")}");
+    }
+// something here
+    else throw new OperationCanceledException();
   }
+  catch (OperationCanceledException)
 }
 
 static void PerformOperation(char operation)
