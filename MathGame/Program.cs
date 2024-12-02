@@ -4,6 +4,7 @@
 // 3. Users should be presented with a menu to choose an operation
 // 4. record previous games in a List and there should be an option in the menu for the user to visualize a history of previous games.
 
+using System.Diagnostics;
 using CodingProject;
 
 MathGameLogic mathGame = new MathGameLogic();
@@ -65,6 +66,23 @@ static int GetMenuSelection(MathGameLogic mathGame)
 
   return menuSelection;
 
+}
+
+// async we have to wait for the task
+static async Task<int?> GetUserResponse(DifficultyLevel difficulty)
+{
+  int response = 0;
+  int timeout = (int)difficulty;
+
+  Stopwatch stopwatch = new Stopwatch();
+  stopwatch.Start();
+
+  Task<string?> getuserInputTask = Task.Run(() => Console.ReadLine());
+
+  try
+  {
+    string? result = await Task.WhenAny(getuserInputTask, Task.Delay(timeout * 1000)) == getuserInputTask;
+  }
 }
 
 static void PerformOperation(char operation)
